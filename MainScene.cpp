@@ -21,9 +21,9 @@ Cat *myCat;
 
 bool MainScene::init()
 {
-	bool bRet = false;
+	/*bool bRet = false;
 	do
-	{
+	{*/
 		if (!Layer::init())
 		{
 			return false;
@@ -39,6 +39,7 @@ bool MainScene::init()
 		MainScene::CreateObjects();
 		MainScene::CharacteristicCat();
 		MainScene::CharacteristicPlayer();
+		//MainScene::AlgorithmWin();
 
 		auto listener = EventListenerTouchOneByOne::create();
 		listener->setSwallowTouches(true);
@@ -47,7 +48,7 @@ bool MainScene::init()
 			//Point touchLocation = _tileMap->convertTouchToNodeSpace(touch);
 			//myCat->moveToward(touchLocation);
 			MainScene::AlgorithmWin();
-			return true;
+			return false;
 		};
 		_eventDispatcher->addEventListenerWithSceneGraphPriority(listener, this);
 		this->scheduleUpdate();
@@ -58,9 +59,10 @@ bool MainScene::init()
 
 		numBonusObjects = 0;
 
-		bRet = true;
+	/*	bRet = true;
 	} while (0);
-	return bRet;
+	return bRet;*/
+	return true;
 }
 
 BonusObject *cObjTmp;
@@ -298,18 +300,24 @@ void MainScene::AlgorithmWin()
 			switch (a[i][j])
 			{
 			case BONUSTYPE_BONE:
+			{
 				x = j * 32 + 16;
 				y = i * 32 + 16;
-				break;
+				Action* moveTo = MoveTo::create(3, Vec2(x, y));
+				myCat->runAction(moveTo);
+				break; 
+			}
 			case BONUSTYPE_CACTUS:
+			{
 				x = j * 32 + 16;
 				y = i * 32 + 16;
-				break;
+				Action* moveToTwo = MoveTo::create(3, Vec2(x, y));
+				myCat->runAction(moveToTwo);
+				break; 
+			}
 			default: break;
 			}
 		}
-		Action* moveTo = MoveTo::create(3, Vec2(x, y));
-		myCat->runAction(moveTo);
 	}
 }
 
