@@ -65,7 +65,7 @@ private:
 	Label *labelCharacteristicCatLives;
 
 	int AttackCat = 0;
-	int	DefenseCat = 0;
+	int DefenseCat = 0;
 	int LivesCat = 0;
 
 	/*Player*/
