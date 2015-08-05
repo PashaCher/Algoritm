@@ -308,10 +308,8 @@ void MainScene::AlgorithmWin()
 			default: break;
 			}
 		}
-		Action* moveTo = MoveTo::create(3, Vec2(200, 200));
-
+		Action* moveTo = MoveTo::create(3, Vec2(x, y));
 		myCat->runAction(moveTo);
-
 	}
 }
 
