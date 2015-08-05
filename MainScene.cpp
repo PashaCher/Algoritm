@@ -287,49 +287,30 @@ void MainScene::ComparisonOfTheCharacteristic()
 
 void MainScene::AlgorithmWin()
 {
-	bool win = false;
-	while (!win)
+	int x, y;
+	if (LivesCat + DefenseCat < AttackPlayer)
 	{
-		if (LivesCat + DefenseCat < AttackPlayer)
+		for (int i = 0; i < 10; ++i)
+		for (int j = 0; j < 10; ++j)
 		{
-			for (int i = 0; i < 10; ++i)
-			for (int j = 0; j < 10; ++j)
+			std::ifstream ifs("UploadObjects.txt");
+			ifs >> a[i][j];
+			switch (a[i][j])
 			{
-				std::ifstream ifs("UploadObjects.txt");
-				ifs >> a[i][j];
-				switch (a[i][j])
-				{
-				case BONUSTYPE_BONE:
-					bObjTmp = (BonusObject*)Sprite::create("bone.png");
-					bObjTmp->setPosition(j * 32 + 16, i * 32 + 16);
-					bObjTmp->setType(BONUSTYPE_BONE);
-					bonusObjects.pushBack(bObjTmp);
-					this->addChild(bObjTmp, 2);
-					break;
-				case BONUSTYPE_CACTUS:
-					bObjTmp = (BonusObject*)Sprite::create("cactus.png");
-					bObjTmp->setPosition(j * 32 + 16, i * 32 + 16);
-					bObjTmp->setType(BONUSTYPE_CACTUS);
-					bonusObjects.pushBack(bObjTmp);
-					this->addChild(bObjTmp, 3);
-					break;
-				default: break;
-				}
+			case BONUSTYPE_BONE:
+				x = j * 32 + 16;
+				y = i * 32 + 16;
+				break;
+			case BONUSTYPE_CACTUS:
+				x = j * 32 + 16;
+				y = i * 32 + 16;
+				break;
+			default: break;
 			}
-
-			int x = bObjTmp->getPosition().x;
-			int y = bObjTmp->getPosition().y;
-
-			Action* moveTo = MoveTo::create(x, y);
-
-			myCat->runAction(moveTo);
-
 		}
+		Action* moveTo = MoveTo::create(3, Vec2(200, 200));
 
-		if ()
-		{
-			win = true;
-		}
+		myCat->runAction(moveTo);
 
 	}
 }
