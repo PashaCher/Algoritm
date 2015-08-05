@@ -64,12 +64,12 @@ bool MainScene::init()
 }
 
 BonusObject *cObjTmp;
+BonusObject *bObjTmp;
 
 void MainScene::CreateObjects()
 {
 	Size visibleSize = Director::getInstance()->getVisibleSize();
 	Vec2 origin = Director::getInstance()->getVisibleOrigin();
-	BonusObject *bObjTmp;
 
 	std::ifstream ifs("UploadObjects.txt");
 	int k = 0;
@@ -287,25 +287,29 @@ void MainScene::ComparisonOfTheCharacteristic()
 
 void MainScene::AlgorithmWin()
 {
-	int x1, y1; // координаты кота
-	int x2, y2; // координаты конечной точки
-	if (LivesCat + DefenseCat < AttackPlayer)
+
+	bool win = false;
+
+	while (!win)
 	{
-		while (x1 != x2 && y1 != y2)
+		if (LivesCat + DefenseCat < AttackPlayer)
 		{
-			if (x1 < x2)
-				x1++;
+			int x = bObjTmp->getPosition().x;
+			int y = bObjTmp->getPosition().y;
 
-			if (x1 > x2)
-				x1--;
+			Action* moveTo = MoveTo::create(x, y);
 
-			if (y1 < y2)
-				y1++;
+			myCat->runAction(moveTo);
 
-			if (y1>y2)
-				y1--;
 		}
+
+		if ()
+		{
+			win = true;
+		}
+
 	}
+}
 }
 
 void MainScene::onKeyPressed(EventKeyboard::KeyCode keyCode, Event* event)
