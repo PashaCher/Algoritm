@@ -48,7 +48,7 @@ bool MainScene::init()
 			//Point touchLocation = _tileMap->convertTouchToNodeSpace(touch);
 			//myCat->moveToward(touchLocation);
 			MainScene::AlgorithmWin();
-			return false;
+			return true;
 		};
 		_eventDispatcher->addEventListenerWithSceneGraphPriority(listener, this);
 		this->scheduleUpdate();
@@ -290,33 +290,82 @@ void MainScene::ComparisonOfTheCharacteristic()
 void MainScene::AlgorithmWin()
 {
 	int x, y;
+	bool isCatItem = false;
 	if (LivesCat + DefenseCat < AttackPlayer)
 	{
 		for (int i = 0; i < 10; ++i)
-		for (int j = 0; j < 10; ++j)
 		{
-			std::ifstream ifs("UploadObjects.txt");
-			ifs >> a[i][j];
-			switch (a[i][j])
+			for (int j = 0; j < 10; ++j)
 			{
-			case BONUSTYPE_BONE:
-			{
-				x = j * 32 + 16;
-				y = i * 32 + 16;
-				Action* moveTo = MoveTo::create(3, Vec2(x, y));
-				myCat->runAction(moveTo);
-				break; 
+				std::ifstream ifs("UploadObjects.txt");
+				ifs >> a[i][j];
+				switch (a[i][j])
+				{
+				case BONUSTYPE_BONE:
+				{
+					x = i;
+					y = j;
+					isCatItem = true;
+					break;
+				}
+				case BONUSTYPE_CACTUS:
+				{
+					x = i;
+					y = j;
+					isCatItem = true;
+					break;
+				}
+				default: break;
+				}
+
+				if (isCatItem) break;
 			}
-			case BONUSTYPE_CACTUS:
-			{
-				x = j * 32 + 16;
-				y = i * 32 + 16;
-				Action* moveToTwo = MoveTo::create(3, Vec2(x, y));
-				myCat->runAction(moveToTwo);
-				break; 
-			}
-			default: break;
-			}
+
+			if (isCatItem) break;
+		}
+
+		if (isCatItem)
+		{
+			//Action* moveToTwo = MoveTo::create(3, Vec2(x, y));
+			//myCat->runAction(moveToTwo);
+			MyMove(x, y);
+		}
+	}
+}
+
+void MainScene::MyMove(int x1, int y1)
+{
+	int x = (myCat->getPosition().x - 16) / 32;
+	int y = (myCat->getPosition().y - 16) / 32;
+
+	while (x != x1 && y != y1)
+	{
+		if (x < x1)
+		{
+			x++;
+			Action* moveToTwo = MoveTo::create(0.3f, Vec2(x * 32 + 16, y * 32 + 16));
+			myCat->runAction(moveToTwo);
+		}
+
+		if (x > x1)
+		{
+			x--;
+			Action* moveToTwo = MoveTo::create(0.3f, Vec2(x * 32 + 16, y * 32 + 16));
+			myCat->runAction(moveToTwo);
+		}
+
+		if (y < y1)
+		{
+			y++;
+			Action* moveToTwo = MoveTo::create(0.3f, Vec2(x * 32 + 16, y * 32 + 16));
+			myCat->runAction(moveToTwo);
+		}
+
+		if (y > y1)
+		{
+			y--;
+			Action* moveToTwo = MoveTo::create(0.3f, Vec2(x * 32 + 16, y * 32 + 16));
+			myCat->runAction(moveToTwo);
 		}
 	}
 }
@@ -349,7 +398,6 @@ void MainScene::onKeyPressed(EventKeyboard::KeyCode keyCode, Event* event)
 
 	if (EventKeyboard::KeyCode::KEY_Q == keyCode)
 	{
-		AlgorithmWin();
 	}
 
 	if (EventKeyboard::KeyCode::KEY_ESCAPE == keyCode)
