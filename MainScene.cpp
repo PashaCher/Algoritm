@@ -21,52 +21,49 @@ Cat *myCat;
 
 bool MainScene::init()
 {
-	/*bool bRet = false;
-	do
-	{*/
-		if (!Layer::init())
-		{
-			return false;
-		}
+	if (!Layer::init())
+	{
+		return false;
+	}
 
-		Size visibleSize = Director::getInstance()->getVisibleSize();
-		Vec2 origin = Director::getInstance()->getVisibleOrigin();
+	Size visibleSize = Director::getInstance()->getVisibleSize();
+	Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
-		_tileMap = TMXTiledMap::create("Map.tmx");
-		this->addChild(_tileMap);
-		_background = _tileMap->getLayer("Background");
+	_tileMap = TMXTiledMap::create("Map.tmx");
+	this->addChild(_tileMap);
+	_background = _tileMap->getLayer("Background");
 
-		MainScene::CreateObjects();
-		MainScene::CharacteristicCat();
-		MainScene::CharacteristicPlayer();
-		//MainScene::AlgorithmWin();
+	//_batchNode = SpriteBatchNode::create("CatTexture.png");
+	//this->addChild(_batchNode);
+	//SpriteFrameCache::getInstance()->addSpriteFramesWithFile("primer.plist");
 
-		auto listener = EventListenerTouchOneByOne::create();
-		listener->setSwallowTouches(true);
-		listener->onTouchBegan = [this](Touch *touch, Event *event)
-		{
-			//Point touchLocation = _tileMap->convertTouchToNodeSpace(touch);
-			//myCat->moveToward(touchLocation);
-			MainScene::AlgorithmWin();
-			return true;
-		};
-		_eventDispatcher->addEventListenerWithSceneGraphPriority(listener, this);
-		this->scheduleUpdate();
+	myCat = Cat::createWithLayer(this);
+	this->addChild(myCat, 4);
 
-		auto listenerkey = EventListenerKeyboard::create();
-		listenerkey->onKeyPressed = CC_CALLBACK_2(MainScene::onKeyPressed, this);
-		_eventDispatcher->addEventListenerWithSceneGraphPriority(listenerkey, this);
+	MainScene::CreateObjects();
+	MainScene::CharacteristicCat();
+	MainScene::CharacteristicPlayer();
+	numBonusObjects = 0;
 
-		numBonusObjects = 0;
+	auto listener = EventListenerTouchOneByOne::create();
+	listener->setSwallowTouches(true);
+	listener->onTouchBegan = [this](Touch *touch, Event *event)
+	{
+		Point touchLocation = _tileMap->convertTouchToNodeSpace(touch);
+		myCat->moveToward(touchLocation);
+		AlgorithmWin();
+		return true;
+	};
+	_eventDispatcher->addEventListenerWithSceneGraphPriority(listener, this);
 
-	/*	bRet = true;
-	} while (0);
-	return bRet;*/
+	auto listenerkey = EventListenerKeyboard::create();
+	listenerkey->onKeyPressed = CC_CALLBACK_2(MainScene::onKeyPressed, this);
+	listenerkey->onKeyReleased = CC_CALLBACK_2(MainScene::onKeyReleased, this);
+	_eventDispatcher->addEventListenerWithSceneGraphPriority(listenerkey, this);
+
+	this->scheduleUpdate();
 	return true;
 }
-
-BonusObject *cObjTmp;
-BonusObject *bObjTmp;
 
 void MainScene::CreateObjects()
 {
@@ -103,10 +100,7 @@ void MainScene::CreateObjects()
 			this->addChild(bObjTmp, 3);
 			break;
 		case 4:
-			myCat = /*(Cat*)*/Sprite::create("Cat.png");
 			myCat->setPosition(j * 32 + 16, i * 32 + 16);
-			this->addChild(myCat, 4);
-			/*myCat->_layer = this;*/
 			break;
 		case 5:
 			cObjTmp = (BonusObject*)Sprite::create("Player.png");
@@ -135,7 +129,7 @@ void MainScene::update(float dt)
 			removeChild(bonusObjects.at(i));
 			AddBonusCat();
 			ComparisonOfTheCharacteristic();
-			AlgorithmWin();
+			//AlgorithmWin();
 		}
 	}
 }
@@ -287,86 +281,130 @@ void MainScene::ComparisonOfTheCharacteristic()
 	}
 }
 
-void MainScene::AlgorithmWin()
+PointArray *MainScene::walkableAdjacentTilesCoordForTileCoord(const Point &tileCoord)
 {
-	int x, y;
-	bool isCatItem = false;
-	if (LivesCat + DefenseCat < AttackPlayer)
+	PointArray *tmp = PointArray::create(8);
+	Point p(tileCoord.x, tileCoord.y - 1);
+	if (this->isValidTileCoord(p) && !this->isWallAtTileCoord(p))
 	{
-		for (int i = 0; i < 10; ++i)
-		{
-			for (int j = 0; j < 10; ++j)
-			{
-				std::ifstream ifs("UploadObjects.txt");
-				ifs >> a[i][j];
-				switch (a[i][j])
-				{
-				case BONUSTYPE_BONE:
-				{
-					x = i;
-					y = j;
-					isCatItem = true;
-					break;
-				}
-				case BONUSTYPE_CACTUS:
-				{
-					x = i;
-					y = j;
-					isCatItem = true;
-					break;
-				}
-				default: break;
-				}
+		tmp->addControlPoint(p);
+	}
+	p.setPoint(tileCoord.x - 1, tileCoord.y);
+	if (this->isValidTileCoord(p) && !this->isWallAtTileCoord(p))
+	{
+		tmp->addControlPoint(p);
+	}
+	p.setPoint(tileCoord.x, tileCoord.y + 1);
+	if (this->isValidTileCoord(p) && !this->isWallAtTileCoord(p))
+	{
+		tmp->addControlPoint(p);
+	}
+	p.setPoint(tileCoord.x + 1, tileCoord.y);
+	if (this->isValidTileCoord(p) && !this->isWallAtTileCoord(p))
+	{
+		tmp->addControlPoint(p);
+	}
+	//
+	p.setPoint(tileCoord.x + 1, tileCoord.y + 1);
+	if (this->isValidTileCoord(p) && !this->isWallAtTileCoord(p))
+	{
+		tmp->addControlPoint(p);
+	}
+	p.setPoint(tileCoord.x + 1, tileCoord.y - 1);
+	if (this->isValidTileCoord(p) && !this->isWallAtTileCoord(p))
+	{
+		tmp->addControlPoint(p);
+	}
+	p.setPoint(tileCoord.x - 1, tileCoord.y - 1);
+	if (this->isValidTileCoord(p) && !this->isWallAtTileCoord(p))
+	{
+		tmp->addControlPoint(p);
+	}
+	p.setPoint(tileCoord.x - 1, tileCoord.y + 1);
+	if (this->isValidTileCoord(p) && !this->isWallAtTileCoord(p))
+	{
+		tmp->addControlPoint(p);
+	}
+	//
+	return tmp;
+}
 
-				if (isCatItem) break;
-			}
+bool MainScene::isWallAtTileCoord(const Point &tileCoord)
+{
+	return (this->isPropAtTileCoordForLayer("Wall", tileCoord, _background));
+}
 
-			if (isCatItem) break;
-		}
+Point MainScene::tileCoordForPosition(const Point &position)
+{
+	int x = position.x / _tileMap->getTileSize().width;
+	int y = ((_tileMap->getMapSize().height * _tileMap->getTileSize().height) - position.y) / _tileMap->getTileSize().height;
+	return Point(x, y);
+}
 
-		if (isCatItem)
-		{
-			//Action* moveToTwo = MoveTo::create(3, Vec2(x, y));
-			//myCat->runAction(moveToTwo);
-			MyMove(x, y);
-		}
+Point MainScene::positionForTileCoord(const Point &tileCoord)
+{
+	int x = (tileCoord.x * _tileMap->getTileSize().width) + _tileMap->getTileSize().width / 2;
+	int y = (_tileMap->getMapSize().height * _tileMap->getTileSize().height) - (tileCoord.y * _tileMap->getTileSize().height) - _tileMap->getTileSize().height / 2;
+	return Point(x, y);
+}
+
+void MainScene::removeObjectAtTileCoord(const Point &tileCoord)
+{
+
+}
+
+bool MainScene::isPropAtTileCoordForLayer(const char *prop, const Point &tileCoord, TMXLayer *layer)
+{
+	if (!this->isValidTileCoord(tileCoord))
+	{
+		return false;
+	}
+	int gid = layer->getTileGIDAt(tileCoord);
+	Value properties = _tileMap->getPropertiesForGID(gid);
+	if (properties.isNull())
+	{
+		return false;
+	}
+	return properties.asValueMap().find(prop) != properties.asValueMap().end();
+}
+
+bool MainScene::isValidTileCoord(const Point &tileCoord)
+{
+	if (tileCoord.x < 0 || tileCoord.y < 0 || tileCoord.x >= _tileMap->getMapSize().width || tileCoord.y >= _tileMap->getMapSize().height)
+	{
+		return false;
+	}
+	else
+	{
+		return true;
 	}
 }
 
-void MainScene::MyMove(int x1, int y1)
+void MainScene::setViewpointCenter(const Point &position)
 {
-	int x = (myCat->getPosition().x - 16) / 32;
-	int y = (myCat->getPosition().y - 16) / 32;
+	Size winSize = Director::getInstance()->getWinSize();
+	int x = MAX(position.x, winSize.width / 2);
+	int y = MAX(position.y, winSize.height / 2);
+	x = MIN(x, (_tileMap->getMapSize().width * _tileMap->getTileSize().width) - winSize.width / 2);
+	y = MIN(y, (_tileMap->getMapSize().height * _tileMap->getTileSize().height) - winSize.height / 2);
+	Point actualPosition(x, y);
+	Point centerOfView(winSize.width / 2, winSize.height / 2);
+	Point viewPoint = centerOfView - actualPosition;
+	_tileMap->setPosition(viewPoint);
+}
 
-	while (x != x1 && y != y1)
+void MainScene::AlgorithmWin()
+{
+	if (LivesCat + DefenseCat < AttackPlayer)
 	{
-		if (x < x1)
-		{
-			x++;
-			Action* moveToTwo = MoveTo::create(0.3f, Vec2(x * 32 + 16, y * 32 + 16));
-			myCat->runAction(moveToTwo);
-		}
-
-		if (x > x1)
-		{
-			x--;
-			Action* moveToTwo = MoveTo::create(0.3f, Vec2(x * 32 + 16, y * 32 + 16));
-			myCat->runAction(moveToTwo);
-		}
-
-		if (y < y1)
-		{
-			y++;
-			Action* moveToTwo = MoveTo::create(0.3f, Vec2(x * 32 + 16, y * 32 + 16));
-			myCat->runAction(moveToTwo);
-		}
-
-		if (y > y1)
-		{
-			y--;
-			Action* moveToTwo = MoveTo::create(0.3f, Vec2(x * 32 + 16, y * 32 + 16));
-			myCat->runAction(moveToTwo);
-		}
+		auto winSize = Director::getInstance()->getWinSize();
+		char message[12] = "Start";
+		auto labellouser = Label::createWithTTF("fonts/arial.ttf", message);
+		labellouser->setScale(5.0F);
+		labellouser->setPosition(winSize.width / 2, winSize.height / 2);
+		this->addChild(labellouser);
+		auto fadeOut = FadeOut::create(6.0f);
+		labellouser->runAction(fadeOut);
 	}
 }
 
