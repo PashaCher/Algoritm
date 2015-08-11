@@ -39,6 +39,20 @@ public:
 
 	void ComparisonOfTheCharacteristic();
 	void AlgorithmWin();
+	void my_move(int x1, int y1);
+
+	/*A*/
+	bool isWallAtTileCoord(const cocos2d::Point &tileCoord);
+	Point tileCoordForPosition(const cocos2d::Point &position);
+	Point positionForTileCoord(const Point &tileCoord);
+	PointArray *walkableAdjacentTilesCoordForTileCoord(const Point &tileCoord);
+	bool isValidTileCoord(const Point &tileCoord);
+	void removeObjectAtTileCoord(const Point &tileCoord);
+	bool isPropAtTileCoordForLayer(const char *prop, const Point &tileCoord, TMXLayer *layer);
+	void setViewpointCenter(const Point &position);
+
+	BonusObject *cObjTmp;
+	BonusObject *bObjTmp;
 private:
 	TMXTiledMap *_tileMap;
 	TMXLayer *_background;
@@ -46,7 +60,7 @@ private:
 	Sprite *flower;
 	Sprite *bone;
 	Sprite *cactus;
-	Sprite *myCat;
+	//Sprite *myCat;
 	Sprite *myPerson;
 
 	Vector<BonusObject*> bonusObjects;
@@ -65,7 +79,7 @@ private:
 	Label *labelCharacteristicCatLives;
 
 	int AttackCat = 0;
-	int DefenseCat = 0;
+	int	DefenseCat = 0;
 	int LivesCat = 0;
 
 	/*Player*/
@@ -78,4 +92,6 @@ private:
 
 	int i;
 	MainScene*_layer;
+	bool isPropAtTileCoordForLayer(const char *prop, const cocos2d::Point &tileCoord, cocos2d::TMXLayer *layer) const;
+	SpriteBatchNode *_batchNode;
 };
